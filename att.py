@@ -21,7 +21,7 @@ def rate_limit(rate):
     return decorator_limit
 
 
-def sendPost(url):
+def send_post(url):
     request = Request(url, b'')
     try:
         urlopen(request)
@@ -29,7 +29,7 @@ def sendPost(url):
         print(f'cannot reach url {url}')
 
 
-def sendGet(url):
+def send_get(url):
     request = Request(url)
 
     content = 'n'
@@ -51,7 +51,7 @@ class AliveNotifier:
 
     def notify(self):
         if self.alive:
-            sendPost(self.url)
+            send_post(self.url)
             self.timer = Timer(self.interval, self.notify)
             self.timer.start()
 
@@ -115,7 +115,7 @@ class Tracker:
         self.is_working = False
         self.alive_notifier.stop()
         print('stop working')
-        sendPost(self.stop_working_url)
+        send_post(self.stop_working_url)
 
     def set_max_idle_time(self, value):
         self.max_idle_time = value
@@ -147,7 +147,7 @@ class TrackerManager:
 
     def check_should_track(self):
         print('check should track')
-        response = sendGet(self.should_track_url)
+        response = send_get(self.should_track_url)
 
         self.timer = Timer(10, self.check_should_track)
         self.timer.start()
@@ -170,7 +170,7 @@ class TrackerManager:
             self.tracker.stop()
 
 
-trackerManager = TrackerManager("http://localhost:3000/shouldTrack", "http://localhost:3000/isWorking",
-                                "http://localhost:3000/stopWorking")
+tracker_manager = TrackerManager("http://localhost:3000/should-track", "http://localhost:3000/is-working",
+                                 "http://localhost:3000/stop-working")
 
-trackerManager.start()
+tracker_manager.start()
