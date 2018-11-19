@@ -166,6 +166,9 @@ class TrackerManager:
         if self.timer:
             self.timer.cancel()
 
+        if self.tracker.is_running():
+            self.tracker.stop()
+
 
 trackerManager = TrackerManager("http://localhost:3000/shouldTrack", "http://localhost:3000/isWorking",
                                 "http://localhost:3000/stopWorking")
