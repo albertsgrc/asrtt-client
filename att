@@ -1,3 +1,5 @@
+#!/usr/bin/env /usr/local/bin/python3
+
 from pynput import mouse, keyboard
 from time import time
 from urllib.request import Request, urlopen
@@ -7,7 +9,7 @@ import logzero
 import logging
 from os import getenv
 
-SHOULD_TRACK_URL = getenv('ATT_TRACK_URL',
+SHOULD_TRACK_URL = getenv('ATT_SHOULD_TRACK_URL',
                           'http://localhost:1337/should-track')
 IS_WORKING_URL = getenv('ATT_IS_WORKING_URL',
                         'http://localhost:1337/is-working')
@@ -27,7 +29,7 @@ if LOG_FILE != None:
 def rate_limit(rate):
     def decorator_limit(fn):
         global last_execution
-        last_execution = 0§
+        last_execution = 0
 
         def wrapper(*args, **kwargs):
             global last_execution
