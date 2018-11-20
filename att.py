@@ -170,7 +170,7 @@ class TrackerManager:
             self.tracker.stop()
 
 
-tracker_manager = TrackerManager("http://localhost:3000/should-track", "http://localhost:3000/is-working",
-                                 "http://localhost:3000/stop-working")
+tracker_manager = TrackerManager("http://localhost:1337/should-track", "http://localhost:1337/is-working",
+                                 "http://localhost:1337/stop-working")
 
 tracker_manager.start()
