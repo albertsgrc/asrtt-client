@@ -73,7 +73,7 @@ class Tracker:
         self.stopped_working_timer = None
         self.started = False
         self.max_idle_time = max_idle_time
-        self.alive_notifier = AliveNotifier(is_working_url, max_idle_time)
+        self.alive_notifier = AliveNotifier(is_working_url, max_idle_time/2)
         self.stop_working_url = stop_working_url
 
     def start(self):
