@@ -2,12 +2,32 @@ from pynput import mouse, keyboard
 from time import time
 from urllib.request import Request, urlopen
 from threading import Timer
+from logzero import logger
+import logzero
+import logging
+from os import getenv
+
+SHOULD_TRACK_URL = getenv('ATT_TRACK_URL',
+                          'http://localhost:1337/should-track')
+IS_WORKING_URL = getenv('ATT_IS_WORKING_URL',
+                        'http://localhost:1337/is-working')
+STOP_WORKING_URL = getenv('ATT_STOP_WORKING_URL',
+                          'http://localhost:1337/stop-working')
+
+LOG_FILE = getenv('ATT_LOG_FILE')
+
+
+if LOG_FILE != None:
+    try:
+        logzero.logfile(LOG_FILE)
+    except:
+        logger.error(f'Invalid log file {LOG_FILE}')
 
 
 def rate_limit(rate):
     def decorator_limit(fn):
         global last_execution
-        last_execution = 0
+        last_execution = 0§
 
         def wrapper(*args, **kwargs):
             global last_execution
@@ -26,7 +46,7 @@ def send_post(url):
     try:
         urlopen(request)
     except:
-        print(f'cannot reach url {url}')
+        logger.warn(f'cannot reach url {url}')
 
 
 def send_get(url):
@@ -37,7 +57,7 @@ def send_get(url):
     try:
         content = urlopen(request).read()
     except:
-        print(f'cannot reach url {url}')
+        logger.warn(f'cannot reach url {url}')
 
     return content
 
@@ -51,6 +71,7 @@ class AliveNotifier:
 
     def notify(self):
         if self.alive:
+            logger.info('alive notification')
             send_post(self.url)
             self.timer = Timer(self.interval, self.notify)
             self.timer.start()
@@ -107,19 +128,22 @@ class Tracker:
         return self.started
 
     def started_working(self):
-        print('start working')
+        logger.info('start working')
         self.is_working = True
         self.alive_notifier.start()
 
     def stopped_working(self):
         self.is_working = False
         self.alive_notifier.stop()
-        print('stop working')
+        logger.info('stop working')
         send_post(self.stop_working_url)
 
     def set_max_idle_time(self, value):
-        self.max_idle_time = value
-        self.alive_notifier.set_interval(value)
+        if self.max_idle_time != value:
+            logger.info(
+                f'update max idle time from {self.max_idle_time} to {value}')
+            self.max_idle_time = value
+            self.alive_notifier.set_interval(value)
 
     @rate_limit(1)
     def action_performed(self, *args):
@@ -146,18 +170,17 @@ class TrackerManager:
         self.check_should_track()
 
     def check_should_track(self):
-        print('check should track')
-        response = send_get(self.should_track_url)
+        response = send_get(self.should_track_url).decode('utf-8')
 
         self.timer = Timer(10, self.check_should_track)
         self.timer.start()
 
-        if response == "n":
-            print('should not track')
+        if response == 'n':
+            logger.info('should not track')
             if self.tracker.is_running():
                 self.tracker.stop()
         else:
-            print(f'should track with max_idle_time={response}')
+            logger.info(f'should track with max_idle_time={int(response)}')
             self.tracker.set_max_idle_time(int(response))
             if not self.tracker.is_running():
                 self.tracker.start()
@@ -170,7 +193,7 @@ class TrackerManager:
             self.tracker.stop()
 
 
-tracker_manager = TrackerManager("http://localhost:1337/should-track", "http://localhost:1337/is-working",
-                                 "http://localhost:1337/stop-working")
+tracker_manager = TrackerManager(
+    SHOULD_TRACK_URL, IS_WORKING_URL, STOP_WORKING_URL)
 
 tracker_manager.start()
