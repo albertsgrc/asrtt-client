@@ -1,9 +1,12 @@
 #!/usr/bin/env sh
+set -x
 
 if [ "$#" -ne 2 ]; then
-    echo "Usage: install.sh server-url user-id"
+    echo "Usage: install.sh server-url-without-last-slash user-id"
     exit 1
 fi
+
+ATT_EXECUTABLE="https://github.com/albertsgrc/att-client/blob/master/att"
 
 ATT_SHOULD_TRACK_URL="$0/should-track/$1"
 ATT_IS_WORKING_URL="$0/is-working/$1"
@@ -15,15 +18,15 @@ COMMAND="ATT_SHOULD_TRACK_URL=$ATT_SHOULD_TRACK_URL ATT_IS_WORKING_URL=$ATT_IS_W
 if [ "$(uname)" == "Darwin" ]; then
     brew install python3
 
-    wget -O /usr/local/bin/att "https://github.com/albertsgrc/att-client/blob/master/att"
+    cd /usr/local/bin && { curl -O "$ATT_EXECUTABLE" ; cd -; }
 
     chmod +x /usr/local/bin/att
 
-    wget -O /tmp/att-macos.zip "https://github.com/albertsgrc/att-client/blob/master/att-macos.zip"
+    cd /tmp && { curl -O -L "https://github.com/albertsgrc/att-client/blob/master/att-macos.zip" ; cd -; }
 
     unzip /tmp/att-macos.zip -d /tmp/
 
-    sed -i'' -e "s/attCommand/$COMMAND/g" /tmp/att.app/Contents/document.wflow
+    sed -i'' -e "s@attCommand@$COMMAND@g" /tmp/att.app/Contents/document.wflow
 
     mv /tmp/att.app /Applications
 
@@ -41,7 +44,7 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
 
     sudo cp $(which python3) /usr/local/bin/python3
 
-    wget -O /usr/local/bin/att "https://github.com/albertsgrc/att-client/blob/master/att"
+    wget -O /usr/local/bin/att "$ATT_EXECUTABLE"
 
     chmod +x /usr/local/bin/att
 
