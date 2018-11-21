@@ -48,18 +48,18 @@ def send_post(url):
     try:
         urlopen(request)
     except:
-        logger.warn(f'cannot reach url {url}')
+        logger.warning(f'cannot reach url {url}')
 
 
 def send_get(url):
     request = Request(url)
 
-    content = 'n'
+    content = b'n'
 
     try:
         content = urlopen(request).read()
     except:
-        logger.warn(f'cannot reach url {url}')
+        logger.warning(f'cannot reach url {url}')
 
     return content
 
