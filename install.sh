@@ -6,23 +6,30 @@ if [ "$#" -ne 2 ]; then
     exit 1
 fi
 
-ATT_EXECUTABLE="https://github.com/albertsgrc/att-client/blob/master/att"
+ATT_EXECUTABLE="https://raw.githubusercontent.com/albertsgrc/att-client/master/att"
+REQUIREMENTS="https://raw.githubusercontent.com/albertsgrc/att-client/master/requirements.txt"
 
-ATT_SHOULD_TRACK_URL="$0/should-track/$1"
-ATT_IS_WORKING_URL="$0/is-working/$1"
-ATT_STOP_WORKING_URL="$0/stop-working/$1"
+ATT_SHOULD_TRACK_URL="$1/should-track/$2"
+ATT_IS_WORKING_URL="$1/is-working/$2"
+ATT_STOP_WORKING_URL="$1/stop-working/$2"
 ATT_LOG_FILE="/tmp/att.log"
 
 COMMAND="ATT_SHOULD_TRACK_URL=$ATT_SHOULD_TRACK_URL ATT_IS_WORKING_URL=$ATT_IS_WORKING_URL ATT_STOP_WORKING_URL=$ATT_STOP_WORKING_URL ATT_LOG_FILE=$ATT_LOG_FILE /usr/local/bin/att"
 
 if [ "$(uname)" == "Darwin" ]; then
+    rm -rf /tmp/att-macos.zip /tmp/att.app /tmp/__MACOSX
+
     brew install python3
+
+    cd /tmp && { curl -O -L "$REQUIREMENTS" ; cd -; }
+
+    pip3 install -r /tmp/requirements.txt
 
     cd /usr/local/bin && { curl -O "$ATT_EXECUTABLE" ; cd -; }
 
     chmod +x /usr/local/bin/att
 
-    cd /tmp && { curl -O -L "https://github.com/albertsgrc/att-client/blob/master/att-macos.zip" ; cd -; }
+    cd /tmp && { curl -O -L "https://github.com/albertsgrc/att-client/raw/master/att-macos.zip" ; cd -; }
 
     unzip /tmp/att-macos.zip -d /tmp/
 
@@ -34,7 +41,7 @@ if [ "$(uname)" == "Darwin" ]; then
     echo "Please add /Applications/att.app to Settings->Users and Groups->Startup items"
 
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-    wget -O /tmp/requirements-att.txt "https://github.com/albertsgrc/att-client/blob/master/requirements.txt"
+    wget -O /tmp/requirements-att.txt "$REQUIREMENTS"
 
     sudo apt-get -y update
     sudo apt-get -y install python3.7
