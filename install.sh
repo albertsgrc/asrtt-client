@@ -1,4 +1,5 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
+
 set -x
 
 if [ "$#" -ne 2 ]; then
@@ -16,7 +17,7 @@ ATT_LOG_FILE="/tmp/att.log"
 
 COMMAND="ATT_SHOULD_TRACK_URL=$ATT_SHOULD_TRACK_URL ATT_IS_WORKING_URL=$ATT_IS_WORKING_URL ATT_STOP_WORKING_URL=$ATT_STOP_WORKING_URL ATT_LOG_FILE=$ATT_LOG_FILE /usr/local/bin/att"
 
-if [ "$(uname)" == "Darwin" ]; then
+if [[ "$OSTYPE" == "darwin" ]]; then
     rm -rf /tmp/att-macos.zip /tmp/att.app /tmp/__MACOSX
 
     brew install python3
@@ -35,12 +36,13 @@ if [ "$(uname)" == "Darwin" ]; then
 
     sed -i'' -e "s@attCommand@$COMMAND@g" /tmp/att.app/Contents/document.wflow
 
+    rm -rf /Applications/att.app
     mv /tmp/att.app /Applications
 
     echo "Please add /Applications/att.app to Settings->Security->Accessibility."
     echo "Please add /Applications/att.app to Settings->Users and Groups->Startup items"
 
-elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+elif [[ "$OSTYPE" == "linux-gnu" ]]; then
     wget -O /tmp/requirements-att.txt "$REQUIREMENTS"
 
     sudo apt-get -y update
@@ -49,11 +51,13 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
 
     pip3 install -r /tmp/requirements-att.txt
 
-    sudo cp $(which python3) /usr/local/bin/python3
+    sudo ln -s $(which python3) /usr/local/bin/python3
 
-    wget -O /usr/local/bin/att "$ATT_EXECUTABLE"
+    rm -f /usr/local/bin/att
 
-    chmod +x /usr/local/bin/att
+    sudo wget -O /usr/local/bin/att "$ATT_EXECUTABLE"
 
-    sudo echo "@reboot $COMMAND" > /etc/cron.d/att
+    sudo chmod +x /usr/local/bin/att
+
+    crontab -l | { cat; echo "@reboot $COMMAND"; } | crontab -
 fi
