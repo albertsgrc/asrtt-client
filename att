@@ -9,12 +9,12 @@ import logzero
 import logging
 from os import getenv
 
-SHOULD_TRACK_URL = getenv('ATT_SHOULD_TRACK_URL',
-                          'http://localhost:1337/should-track')
-IS_WORKING_URL = getenv('ATT_IS_WORKING_URL',
-                        'http://localhost:1337/is-working')
-STOP_WORKING_URL = getenv('ATT_STOP_WORKING_URL',
-                          'http://localhost:1337/stop-working')
+SHOULD_TRACK_URL = getenv('ATT_SHOULD_TRACK_URL')
+SET_IS_WORKING_URL = getenv('ATT_SET_IS_WORKING_URL')
+SET_NOT_WORKING_URL = getenv('ATT_SET_NOT_WORKING_URL')
+
+if SHOULD_TRACK_URL == None or SET_IS_WORKING_URL == None or SET_NOT_WORKING_URL == None:
+    logger.error(f'One or more server URL(s) are missing')
 
 LOG_FILE = getenv('ATT_LOG_FILE')
 
@@ -91,13 +91,13 @@ class AliveNotifier:
 
 
 class Tracker:
-    def __init__(self, max_idle_time, is_working_url, stop_working_url):
+    def __init__(self, max_idle_time, set_is_working_url, set_not_working_url):
         self.is_working = None
         self.stopped_working_timer = None
         self.started = False
         self.max_idle_time = max_idle_time
-        self.alive_notifier = AliveNotifier(is_working_url, max_idle_time/2)
-        self.stop_working_url = stop_working_url
+        self.alive_notifier = AliveNotifier(set_is_working_url, max_idle_time/2)
+        self.set_not_working_url = set_not_working_url
 
     def start(self):
         self.is_working = False
@@ -138,7 +138,7 @@ class Tracker:
         self.is_working = False
         self.alive_notifier.stop()
         logger.info('stop working')
-        send_post(self.stop_working_url)
+        send_post(self.set_not_working_url)
 
     def set_max_idle_time(self, value):
         if self.max_idle_time != value:
@@ -161,11 +161,11 @@ class Tracker:
 
 
 class TrackerManager:
-    def __init__(self, should_track_url, is_working_url, stop_working_url):
+    def __init__(self, should_track_url, set_is_working_url, set_not_working_url):
         self.should_track_url = should_track_url
-        self.is_working_url = is_working_url
-        self.stop_working_url = stop_working_url
-        self.tracker = Tracker(0, is_working_url, stop_working_url)
+        self.set_is_working_url = set_is_working_url
+        self.set_not_working_url = set_not_working_url
+        self.tracker = Tracker(0, set_is_working_url, set_not_working_url)
         self.timer = None
 
     def start(self):
@@ -196,6 +196,6 @@ class TrackerManager:
 
 
 tracker_manager = TrackerManager(
-    SHOULD_TRACK_URL, IS_WORKING_URL, STOP_WORKING_URL)
+    SHOULD_TRACK_URL, SET_IS_WORKING_URL, SET_NOT_WORKING_URL)
 
 tracker_manager.start()

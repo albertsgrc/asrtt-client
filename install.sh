@@ -10,12 +10,12 @@ fi
 ATT_EXECUTABLE="https://raw.githubusercontent.com/albertsgrc/att-client/master/att"
 REQUIREMENTS="https://raw.githubusercontent.com/albertsgrc/att-client/master/requirements.txt"
 
-ATT_SHOULD_TRACK_URL="$1/should-track/$2"
-ATT_IS_WORKING_URL="$1/is-working/$2"
-ATT_STOP_WORKING_URL="$1/stop-working/$2"
+ATT_SHOULD_TRACK_URL="$1/user/$2/should-track"
+ATT_SET_IS_WORKING_URL="$1/user/$2/set-is-working"
+ATT_SET_NOT_WORKING_URL="$1/user/$2/set-not-working"
 ATT_LOG_FILE="/tmp/att.log"
 
-COMMAND="ATT_SHOULD_TRACK_URL=$ATT_SHOULD_TRACK_URL ATT_IS_WORKING_URL=$ATT_IS_WORKING_URL ATT_STOP_WORKING_URL=$ATT_STOP_WORKING_URL ATT_LOG_FILE=$ATT_LOG_FILE /usr/local/bin/att"
+COMMAND="ATT_SHOULD_TRACK_URL=$ATT_SHOULD_TRACK_URL ATT_SET_IS_WORKING_URL=$ATT_SET_IS_WORKING_URL ATT_SET_NOT_WORKING_URL=$ATT_SET_NOT_WORKING_URL ATT_LOG_FILE=$ATT_LOG_FILE /usr/local/bin/att"
 
 if [[ "$OSTYPE" == "darwin" ]]; then
     rm -rf /tmp/att-macos.zip /tmp/att.app /tmp/__MACOSX
