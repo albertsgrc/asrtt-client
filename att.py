@@ -13,17 +13,7 @@ SHOULD_TRACK_URL = getenv('ATT_SHOULD_TRACK_URL')
 SET_IS_WORKING_URL = getenv('ATT_SET_IS_WORKING_URL')
 SET_NOT_WORKING_URL = getenv('ATT_SET_NOT_WORKING_URL')
 
-if SHOULD_TRACK_URL == None or SET_IS_WORKING_URL == None or SET_NOT_WORKING_URL == None:
-    logger.error(f'One or more server URL(s) are missing')
-
 LOG_FILE = getenv('ATT_LOG_FILE')
-
-
-if LOG_FILE != None:
-    try:
-        logzero.logfile(LOG_FILE)
-    except:
-        logger.error(f'Invalid log file {LOG_FILE}')
 
 
 def rate_limit(rate):
@@ -195,7 +185,32 @@ class TrackerManager:
             self.tracker.stop()
 
 
-tracker_manager = TrackerManager(
-    SHOULD_TRACK_URL, SET_IS_WORKING_URL, SET_NOT_WORKING_URL)
 
-tracker_manager.start()
+def main():
+    if SHOULD_TRACK_URL == None or SET_IS_WORKING_URL == None or SET_NOT_WORKING_URL == None:
+        logger.error(f'One or more server URL(s) are missing')
+    
+    if LOG_FILE != None:
+        try:
+            logzero.logfile(LOG_FILE)
+        except:
+            logger.error(f'Invalid log file {LOG_FILE}')
+
+    tracker_manager = TrackerManager(SHOULD_TRACK_URL, SET_IS_WORKING_URL, SET_NOT_WORKING_URL)
+
+    tracker_manager.start()
+
+
+
+if __name__ == "__main__":
+    main()
+
+# Git: https://www.pygit2.org/references.html#the-head
+# head = repo.lookup_reference('HEAD').resolve()
+# head = repo.head
+# branch_name = head.name
+
+# Gitlab: https://python-gitlab.readthedocs.io/en/stable/gl_objects/issues.html
+
+
+
