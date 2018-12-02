@@ -4,7 +4,12 @@ import time
 import json
 from threading import Timer
 from os import getenv, getcwd
+import os
 import re
+import sys
+import fcntl
+from signal import signal, SIGTERM
+import atexit
 
 from git import Repo
 from pynput import mouse, keyboard
@@ -295,6 +300,49 @@ def cli():
 def start():
     global tracker_manager
 
+    if os.path.isfile(pidPath):
+        with open(pidPath, "r") as old_pidfile:
+            global old_pid
+            old_pid = old_pidfile.read()
+
+    try:
+        lockfile = open(pidPath, "w")
+    except IOError:
+        print(f'asrtt is already running')
+        sys.exit(1)
+
+    try:
+        # Try to get an exclusive lock on the file. This will fail if another process has the file
+        # locked.
+        fcntl.flock(lockfile, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except IOError:
+        print(f'asrtt is already running')
+        with open(pidPath, "w") as pidfile:
+            pidfile.write(old_pid)
+        sys.exit(1)
+
+    def sigterm(_, i):
+        tracker_manager.stop()
+        try:
+            sys.exit(0)
+        except:
+            pass
+
+    def mexit():
+        tracker_manager.stop()
+        os.remove(pidPath)
+        sys.exit(0)
+
+    signal(SIGTERM, sigterm)
+    atexit.register(mexit)
+
+    try:
+        lockfile.write("%s" % (os.getpid()))
+        lockfile.flush()
+    except IOError:
+        print("Unable to write pid to the pidfile.")
+        sys.exit(1)
+
     server_url = conf.get('serverUrl')
 
     should_track_url = server_url + 'should-track'
@@ -305,6 +353,17 @@ def start():
         should_track_url, set_is_working_url, set_not_working_url)
 
     tracker_manager.start()
+
+
+@click.command('stop', short_help='Stop tracking time')
+def stop():
+    if os.path.isfile(pidPath):
+        with open(pidPath, "r") as old_pidfile:
+            old_pid = old_pidfile.read()
+            print('stopping asrtt')
+            os.kill(int(old_pid), SIGTERM)
+    else:
+        print('asrtt it not tracking')
 
 
 @click.command('reset-config', short_help='Reset configuration')
@@ -332,6 +391,7 @@ def get_config():
 
 
 cli.add_command(start)
+cli.add_command(stop)
 cli.add_command(reset_config)
 cli.add_command(set_repo)
 cli.add_command(get_repo)
@@ -339,6 +399,9 @@ cli.add_command(get_config)
 
 
 def main():
+    global pidPath
+    pidPath = "/tmp/asrtt.pid"
+
     global conf
     conf = ConfigStore('asrtt')
 
