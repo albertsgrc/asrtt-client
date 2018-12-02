@@ -40,11 +40,13 @@ def client_data():
 
     remote_info = get_remote_info(repository_path)
 
-    data_dict = {**remote_info, **data_dict}
-
-    data_dict['gitBranch'] = get_current_branch_name(repository_path)
-
-    return data_dict
+    return {
+        "gitlabHostname": remote_info['hostname'],
+        "gitlabProject": remote_info['project'],
+        "gitlabToken": data_dict['gitlabToken'],
+        "togglToken": data_dict['togglToken'],
+        "gitBranch": get_current_branch_name(repository_path)
+    }
 
 
 def rate_limit(rate):
@@ -326,7 +328,7 @@ def set_repo(path):
 
 @click.command('get-config', short_help='Print the current configuration')
 def get_config():
-    print(json.dumps(client_data(), sort_keys=True, indent=4))
+    print(json.dumps(conf.all(), sort_keys=True, indent=4))
 
 
 cli.add_command(start)
