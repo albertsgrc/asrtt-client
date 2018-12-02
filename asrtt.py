@@ -274,7 +274,7 @@ def initialize_config(conf):
         inquirer.Text(
             'serverUrl', message="Enter the tracking server url", validate=serverUrlValidator),
         inquirer.Path('logsFile', message="Enter the logs file path",
-                      path_type=inquirer.Path.FILE, default="/tmp/att.log")
+                      path_type=inquirer.Path.FILE, default="/tmp/asrtt.log")
     ]
 
     answers = inquirer.prompt(questions)
@@ -338,7 +338,7 @@ cli.add_command(get_config)
 
 def main():
     global conf
-    conf = ConfigStore('att')
+    conf = ConfigStore('asrtt')
 
     global justInitialized
     justInitialized = conf.size == 0

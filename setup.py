@@ -1,11 +1,19 @@
+import setuptools
 from setuptools import setup
 
-setup(
-    name='att',
-    version='0.10',
-    py_modules=['att'],
-    author='Albert Segarra',
-    url='https://github.com/albertsgrc/att-client',
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
+
+setuptools.setup(
+    name="asrtt",
+    version="0.0.2",
+    author="Albert",
+    description="An automated time tracker",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/albertsgrc/asrtt-client",
+    py_modules=['asrtt', 'configstore', 'utils'],
     install_requires=[
         'pynput==1.4',
         'logzero==1.5.0',
@@ -15,8 +23,13 @@ setup(
         'inquirer==2.5.1',
         'validators==0.12.3',
     ],
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: Unix",
+    ],
     entry_points='''
         [console_scripts]
-        att=att.att:main
+        asrtt=asrtt:main
    ''',
 )
