@@ -88,7 +88,6 @@ def getConfigSize(path):
 
 
 def dotnotation(key, value):
-
     key = key.replace("\\.", "~=~")
     keyArr = key.split('.')[::-1]
     for arr in keyArr:

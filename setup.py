@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='att',
     version='0.10',
-    py_modules=['att.py', 'configstore.py', 'utils.py'],
+    py_modules=['att'],
     author='Albert Segarra',
     url='https://github.com/albertsgrc/att-client',
     install_requires=[
