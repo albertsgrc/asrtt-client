@@ -98,7 +98,6 @@ class AliveNotifier:
 
     def notify(self):
         if self.alive:
-            logger.info('alive notification')
             send_post(self.url, client_data())
             self.timer = Timer(self.interval, self.notify)
             self.timer.start()
@@ -122,7 +121,7 @@ class Tracker:
         self.started = False
         self.max_idle_time = max_idle_time
         self.alive_notifier = AliveNotifier(
-            set_is_working_url, max_idle_time/2)
+            set_is_working_url, max_idle_time//2)
         self.set_not_working_url = set_not_working_url
 
     def start(self):
@@ -171,7 +170,7 @@ class Tracker:
             logger.info(
                 f'update max idle time from {self.max_idle_time} to {value}')
             self.max_idle_time = value
-            self.alive_notifier.set_interval(value)
+            self.alive_notifier.set_interval(value//2)
 
     @rate_limit(1)
     def action_performed(self, *args):
