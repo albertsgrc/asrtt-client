@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="asrtt",
-    version="0.0.3",
+    version="1.0.0",
     author="Albert",
     description="An automated time tracker",
     long_description=long_description,
