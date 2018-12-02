@@ -9,17 +9,17 @@ if [[ "$OSTYPE" == "darwin" ]]; then
 
     pip3 install asrtt
 
-    cd /tmp && { curl -O -L "https://github.com/albertsgrc/att-client/raw/master/att-macos.zip" ; cd -; }
+    cd /tmp && { curl -O -L "https://github.com/albertsgrc/att-client/raw/master/asrtt-macos.zip" ; cd -; }
 
     unzip /tmp/att-macos.zip -d /tmp/
 
-    sed -i'' -e "s@asrttCommand@$COMMAND@g" /tmp/att.app/Contents/document.wflow
+    rm -rf /Applications/asrtt.app
+    mv /tmp/asrtt.app /Applications
 
-    rm -rf /Applications/att.app
-    mv /tmp/att.app /Applications
+    /usr/local/bin/asrtt
 
-    echo "Please add /Applications/att.app to Settings->Security->Accessibility."
-    echo "Please add /Applications/att.app to Settings->Users and Groups->Startup items"
+    echo "Please add /Applications/asrtt.app to Settings->Security->Accessibility."
+    echo "Please add /Applications/asrtt.app to Settings->Users and Groups->Startup items"
 
 elif [[ "$OSTYPE" == "linux-gnu" ]]; then
     sudo apt-get -y update
@@ -30,5 +30,7 @@ elif [[ "$OSTYPE" == "linux-gnu" ]]; then
 
     sudo ln -s $(which python3) /usr/local/bin/python3
 
-    crontab -l | { cat; echo "@reboot $COMMAND"; } | crontab -
+    asrtt
+
+    crontab -l | { cat; echo "@reboot asrtt start"; } | crontab -
 fi
