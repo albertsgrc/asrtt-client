@@ -75,7 +75,7 @@ def send_get(url):
     result = {}
 
     try:
-        requests.get(url).json()
+        result = requests.get(url).json()
     except:
         logger.error(f'cannot GET {url}')
 
