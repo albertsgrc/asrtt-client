@@ -224,7 +224,7 @@ class TrackerManager:
 def is_git_repo(path):
     is_repo = True
     try:
-        Repo(getcwd())
+        Repo(path)
     except:
         is_repo = False
 
@@ -295,8 +295,7 @@ def cli():
     pass
 
 
-@click.command('start', short_help='Start tracking time')
-def start():
+def start_tracking():
     global tracker_manager
 
     if os.path.isfile(pidPath):
@@ -354,6 +353,11 @@ def start():
     tracker_manager.start()
 
 
+@click.command('start', short_help='Start tracking time')
+def start():
+    start_tracking()
+
+
 @click.command('stop', short_help='Stop tracking time')
 def stop():
     if os.path.isfile(pidPath):
@@ -365,6 +369,19 @@ def stop():
         print('asrtt it not tracking')
 
 
+@click.command('restart', short_help='Restart att')
+def restart():
+    if os.path.isfile(pidPath):
+        with open(pidPath, "r") as old_pidfile:
+            old_pid = old_pidfile.read()
+            print('stopping asrtt')
+            os.kill(int(old_pid), SIGTERM)
+    else:
+        print('asrtt it not tracking')
+
+    start_tracking()
+
+
 @click.command('reset-config', short_help='Reset configuration')
 def reset_config():
     if not justInitialized:
@@ -374,14 +391,19 @@ def reset_config():
 @click.command('get-repo', short_help='Print the current git repository directory')
 def get_repo():
     current = conf.get('repositoryPath')
-    logger.info(f'Current repository path is {current}')
+    logger.info(
+        f'Current repository path is {current}.\nYou don\'t need to restart asrtt to apply the changes.')
 
 
 @click.command('set-repo', short_help='Set the current git repository directory')
 @click.option('--path', '-p', default=getcwd(), help="Set the repository directory")
 def set_repo(path):
-    conf.set('repositoryPath', path)
-    logger.info(f'Repository path set to {path}')
+    print(is_git_repo(path))
+    if not is_git_repo(path):
+        logger.error(f'Invalid repository path {path}')
+    else:
+        conf.set('repositoryPath', path)
+        logger.info(f'Repository path set to {path}')
 
 
 @click.command('get-config', short_help='Print the current configuration')
@@ -391,6 +413,7 @@ def get_config():
 
 cli.add_command(start)
 cli.add_command(stop)
+cli.add_command(restart)
 cli.add_command(reset_config)
 cli.add_command(set_repo)
 cli.add_command(get_repo)

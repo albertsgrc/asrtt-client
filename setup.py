@@ -31,5 +31,5 @@ setuptools.setup(
     entry_points='''
         [console_scripts]
         asrtt=asrtt:main
-   ''',
+    ''',
 )
