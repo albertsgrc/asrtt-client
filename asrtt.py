@@ -75,7 +75,7 @@ def send_post(url, json={}):
     try:
         requests.post(url, json=json)
     except:
-        logger.error(f'cannot POST {url}')
+        logger.error(f'Cannot POST {url}')
 
 
 def send_get(url):
@@ -84,7 +84,7 @@ def send_get(url):
     try:
         result = requests.get(url).json()
     except:
-        logger.error(f'cannot GET {url}')
+        logger.error(f'Cannot GET {url}')
 
     return result
 
@@ -155,20 +155,20 @@ class Tracker:
         return self.started
 
     def started_working(self):
-        logger.info('start working')
+        logger.info('Start working')
         self.is_working = True
         self.alive_notifier.start()
 
     def stopped_working(self):
         self.is_working = False
         self.alive_notifier.stop()
-        logger.info('stop working')
+        logger.info('Stop working')
         send_post(self.set_not_working_url, client_data())
 
     def set_max_idle_time(self, value):
         if self.max_idle_time != value:
             logger.info(
-                f'update max idle time from {self.max_idle_time} to {value}')
+                f'Update max idle time from {self.max_idle_time} to {value}')
             self.max_idle_time = value
             self.alive_notifier.set_interval(value//2)
 
@@ -204,12 +204,12 @@ class TrackerManager:
 
         if 'maxIdleTime' in response:
             max_idle_time = response['maxIdleTime']
-            logger.info(f'should track with max_idle_time={max_idle_time}')
+            logger.info(f'Should track with max_idle_time={max_idle_time}')
             self.tracker.set_max_idle_time(max_idle_time)
             if not self.tracker.is_running():
                 self.tracker.start()
         else:
-            logger.info('should not track')
+            logger.info('Should not track')
             if self.tracker.is_running():
                 self.tracker.stop()
 
@@ -306,7 +306,7 @@ def start_tracking():
     try:
         lockfile = open(pidPath, "w")
     except IOError:
-        print(f'asrtt is already running')
+        print(f'Asrtt is already running')
         sys.exit(1)
 
     try:
@@ -314,7 +314,7 @@ def start_tracking():
         # locked.
         fcntl.flock(lockfile, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except IOError:
-        print(f'asrtt is already running')
+        print(f'Asrtt is already running')
         with open(pidPath, "w") as pidfile:
             pidfile.write(old_pid)
         sys.exit(1)
@@ -363,10 +363,10 @@ def stop():
     if os.path.isfile(pidPath):
         with open(pidPath, "r") as old_pidfile:
             old_pid = old_pidfile.read()
-            print('stopping asrtt')
+            print('Stopping asrtt')
             os.kill(int(old_pid), SIGTERM)
     else:
-        print('asrtt it not tracking')
+        print('Asrtt is not tracking')
 
 
 @click.command('restart', short_help='Restart att')
@@ -377,7 +377,7 @@ def restart():
             print('stopping asrtt')
             os.kill(int(old_pid), SIGTERM)
     else:
-        print('asrtt it not tracking')
+        print('Asrtt is not tracking')
 
     start_tracking()
 
@@ -392,18 +392,18 @@ def reset_config():
 def get_repo():
     current = conf.get('repositoryPath')
     logger.info(
-        f'Current repository path is {current}.\nYou don\'t need to restart asrtt to apply the changes.')
+        f'Current repository path is {current}')
 
 
 @click.command('set-repo', short_help='Set the current git repository directory')
 @click.option('--path', '-p', default=getcwd(), help="Set the repository directory")
 def set_repo(path):
-    print(is_git_repo(path))
     if not is_git_repo(path):
         logger.error(f'Invalid repository path {path}')
     else:
         conf.set('repositoryPath', path)
-        logger.info(f'Repository path set to {path}')
+        logger.info(
+            f'Repository path set to {path}. \nYou don\'t need to restart asrtt to apply the changes.')
 
 
 @click.command('get-config', short_help='Print the current configuration')
