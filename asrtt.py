@@ -146,9 +146,9 @@ class Tracker:
         self.started = False
         self.mouseListener.stop()
         self.keyboardListener.stop()
-        self.alive_notifier.stop()
 
         if self.is_working:
+            self.stopped_working()
             self.stopped_working_timer.cancel()
 
     def is_running(self):
