@@ -21,7 +21,7 @@ setuptools.setup(
         'requests>=2.20.0',
         'gitpython==2.1.11',
         'inquirer==2.5.1',
-        'validators==0.12.3',
+        'validators==0.12.6',
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
